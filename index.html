@@ -1,34 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Quiz Game</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Web Development Quiz Game - Test your knowledge of HTML, CSS, and JavaScript.">
+  <title>Interactive Quiz Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-<div id="startScreen">
-<h1>Quiz Game</h1>
-<button id="startBtn">Start Quiz</button>
-</div>
+  <div class="app-wrapper">
+    <!-- Welcome / Start Screen -->
+    <main id="start-screen" class="card fade-in">
+      <div class="quiz-icon-wrapper">
+        <span class="quiz-icon" aria-hidden="true">💡</span>
+      </div>
+      <h1 class="card-title">Web Development Quiz</h1>
+      <p class="card-subtitle">
+        Test your knowledge of HTML, CSS, and JavaScript fundamentals with interactive multiple-choice questions.
+      </p>
 
-<div id="quizBox" class="hidden">
-<div class="top">
-<div id="progress"></div>
-<div id="timer">15</div>
-</div>
-<h2 id="question"></h2>
-<div id="answers"></div>
-<button id="nextBtn" class="hidden">Next</button>
-</div>
+      <div class="quiz-config">
+        <span class="config-label">Select Number of Questions:</span>
+        <div class="option-pill-group" role="group" aria-label="Question count selection">
+          <button type="button" class="pill-btn" data-count="5">5 Questions</button>
+          <button type="button" class="pill-btn active" data-count="10">10 Questions</button>
+        </div>
+      </div>
 
-<div id="result" class="hidden">
-<h2>Quiz Finished!</h2>
-<p>Your Score: <span id="score"></span></p>
-<p>Best Score: <span id="best"></span></p>
-<button onclick="location.reload()">Restart</button>
-</div>
-</div>
-<script src="script.js"></script>
+      <div id="start-best-score" class="best-score-badge hidden">
+        <span>🏆 Best Score:</span>
+        <strong id="start-best-score-val">0/10 (0%)</strong>
+      </div>
+
+      <div class="card-actions">
+        <button id="start-btn" class="btn btn-primary btn-block">
+          Start Quiz
+          <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- Quiz Question Screen -->
+    <section id="quiz-screen" class="card hidden" aria-live="polite">
+      <!-- Quiz Header & Meta -->
+      <div class="quiz-header">
+        <div class="quiz-meta-badge">
+          <span id="question-tracker">Question 1 of 10</span>
+        </div>
+        <div id="timer-badge" class="timer-badge" aria-label="Time remaining">
+          <svg class="timer-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="timer-display">15s</span>
+        </div>
+      </div>
+
+      <!-- Thin Animated Progress Bar -->
+      <div class="progress-container" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" aria-label="Quiz progress">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+      <!-- Question Text -->
+      <h2 id="question-text" class="question-title">Question goes here...</h2>
+
+      <!-- Answer Options List -->
+      <div id="answers-container" class="answers-list" role="group" aria-label="Answer options">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
+
+      <!-- Quiz Card Footer -->
+      <div class="quiz-footer">
+        <div id="feedback-hint" class="feedback-hint">
+          <span>Select an answer to continue</span>
+        </div>
+        <button id="next-btn" class="btn btn-primary hidden">
+          Next Question
+          <span class="btn-arrow" aria-hidden="true">&rarr;</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Results Screen -->
+    <section id="result-screen" class="card hidden">
+      <div class="result-badge-icon" id="result-icon" aria-hidden="true">🎉</div>
+      <h2 class="card-title" id="result-title">Quiz Completed!</h2>
+      <p id="result-feedback" class="card-subtitle">Great effort on finishing the quiz!</p>
+
+      <!-- Score Overview Card -->
+      <div class="score-display-card">
+        <div class="score-main">
+          <span class="score-number" id="final-score-val">0</span>
+          <span class="score-divider">/</span>
+          <span class="score-total" id="final-total-val">10</span>
+        </div>
+        <div class="score-percent-badge" id="final-percent-val">0%</div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Correct</span>
+          <strong class="stat-value text-success" id="stat-correct">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Incorrect</span>
+          <strong class="stat-value text-danger" id="stat-wrong">0</strong>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Best Record</span>
+          <strong class="stat-value text-primary" id="stat-best">0%</strong>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="card-actions-row">
+        <button id="restart-btn" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          Restart Quiz
+        </button>
+        <button id="home-btn" class="btn btn-secondary">Change Settings</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
